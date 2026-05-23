@@ -9,38 +9,127 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as RestaurantsRouteImport } from './routes/restaurants'
+import { Route as ProfileRouteImport } from './routes/profile'
+import { Route as LoginRouteImport } from './routes/login'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as RestaurantsSlugRouteImport } from './routes/restaurants.$slug'
+import { Route as QueueIdRouteImport } from './routes/queue.$id'
 
+const RestaurantsRoute = RestaurantsRouteImport.update({
+  id: '/restaurants',
+  path: '/restaurants',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ProfileRoute = ProfileRouteImport.update({
+  id: '/profile',
+  path: '/profile',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LoginRoute = LoginRouteImport.update({
+  id: '/login',
+  path: '/login',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const RestaurantsSlugRoute = RestaurantsSlugRouteImport.update({
+  id: '/$slug',
+  path: '/$slug',
+  getParentRoute: () => RestaurantsRoute,
+} as any)
+const QueueIdRoute = QueueIdRouteImport.update({
+  id: '/queue/$id',
+  path: '/queue/$id',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/login': typeof LoginRoute
+  '/profile': typeof ProfileRoute
+  '/restaurants': typeof RestaurantsRouteWithChildren
+  '/queue/$id': typeof QueueIdRoute
+  '/restaurants/$slug': typeof RestaurantsSlugRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/login': typeof LoginRoute
+  '/profile': typeof ProfileRoute
+  '/restaurants': typeof RestaurantsRouteWithChildren
+  '/queue/$id': typeof QueueIdRoute
+  '/restaurants/$slug': typeof RestaurantsSlugRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/login': typeof LoginRoute
+  '/profile': typeof ProfileRoute
+  '/restaurants': typeof RestaurantsRouteWithChildren
+  '/queue/$id': typeof QueueIdRoute
+  '/restaurants/$slug': typeof RestaurantsSlugRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/'
+  fullPaths:
+    | '/'
+    | '/login'
+    | '/profile'
+    | '/restaurants'
+    | '/queue/$id'
+    | '/restaurants/$slug'
   fileRoutesByTo: FileRoutesByTo
-  to: '/'
-  id: '__root__' | '/'
+  to:
+    | '/'
+    | '/login'
+    | '/profile'
+    | '/restaurants'
+    | '/queue/$id'
+    | '/restaurants/$slug'
+  id:
+    | '__root__'
+    | '/'
+    | '/login'
+    | '/profile'
+    | '/restaurants'
+    | '/queue/$id'
+    | '/restaurants/$slug'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  LoginRoute: typeof LoginRoute
+  ProfileRoute: typeof ProfileRoute
+  RestaurantsRoute: typeof RestaurantsRouteWithChildren
+  QueueIdRoute: typeof QueueIdRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/restaurants': {
+      id: '/restaurants'
+      path: '/restaurants'
+      fullPath: '/restaurants'
+      preLoaderRoute: typeof RestaurantsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/profile': {
+      id: '/profile'
+      path: '/profile'
+      fullPath: '/profile'
+      preLoaderRoute: typeof ProfileRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/login': {
+      id: '/login'
+      path: '/login'
+      fullPath: '/login'
+      preLoaderRoute: typeof LoginRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/': {
       id: '/'
       path: '/'
@@ -48,22 +137,42 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/restaurants/$slug': {
+      id: '/restaurants/$slug'
+      path: '/$slug'
+      fullPath: '/restaurants/$slug'
+      preLoaderRoute: typeof RestaurantsSlugRouteImport
+      parentRoute: typeof RestaurantsRoute
+    }
+    '/queue/$id': {
+      id: '/queue/$id'
+      path: '/queue/$id'
+      fullPath: '/queue/$id'
+      preLoaderRoute: typeof QueueIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
+interface RestaurantsRouteChildren {
+  RestaurantsSlugRoute: typeof RestaurantsSlugRoute
+}
+
+const RestaurantsRouteChildren: RestaurantsRouteChildren = {
+  RestaurantsSlugRoute: RestaurantsSlugRoute,
+}
+
+const RestaurantsRouteWithChildren = RestaurantsRoute._addFileChildren(
+  RestaurantsRouteChildren,
+)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  LoginRoute: LoginRoute,
+  ProfileRoute: ProfileRoute,
+  RestaurantsRoute: RestaurantsRouteWithChildren,
+  QueueIdRoute: QueueIdRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}
