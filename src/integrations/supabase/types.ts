@@ -14,7 +14,131 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      profiles: {
+        Row: {
+          created_at: string
+          display_name: string | null
+          id: string
+          phone: string | null
+        }
+        Insert: {
+          created_at?: string
+          display_name?: string | null
+          id: string
+          phone?: string | null
+        }
+        Update: {
+          created_at?: string
+          display_name?: string | null
+          id?: string
+          phone?: string | null
+        }
+        Relationships: []
+      }
+      queue_entries: {
+        Row: {
+          created_at: string
+          id: string
+          notes: string | null
+          party_size: number
+          restaurant_id: string
+          seating_preference: string | null
+          status: Database["public"]["Enums"]["queue_status"]
+          token_number: number
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          notes?: string | null
+          party_size?: number
+          restaurant_id: string
+          seating_preference?: string | null
+          status?: Database["public"]["Enums"]["queue_status"]
+          token_number: number
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          notes?: string | null
+          party_size?: number
+          restaurant_id?: string
+          seating_preference?: string | null
+          status?: Database["public"]["Enums"]["queue_status"]
+          token_number?: number
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "queue_entries_restaurant_id_fkey"
+            columns: ["restaurant_id"]
+            isOneToOne: false
+            referencedRelation: "restaurants"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      restaurants: {
+        Row: {
+          address: string | null
+          avg_service_minutes: number | null
+          capacity: number | null
+          closes_at: string | null
+          created_at: string
+          cuisine: string
+          current_serving_token: number | null
+          description: string | null
+          id: string
+          image_url: string | null
+          is_open: boolean | null
+          name: string
+          opens_at: string | null
+          owner_id: string | null
+          rating: number | null
+          slug: string
+        }
+        Insert: {
+          address?: string | null
+          avg_service_minutes?: number | null
+          capacity?: number | null
+          closes_at?: string | null
+          created_at?: string
+          cuisine: string
+          current_serving_token?: number | null
+          description?: string | null
+          id?: string
+          image_url?: string | null
+          is_open?: boolean | null
+          name: string
+          opens_at?: string | null
+          owner_id?: string | null
+          rating?: number | null
+          slug: string
+        }
+        Update: {
+          address?: string | null
+          avg_service_minutes?: number | null
+          capacity?: number | null
+          closes_at?: string | null
+          created_at?: string
+          cuisine?: string
+          current_serving_token?: number | null
+          description?: string | null
+          id?: string
+          image_url?: string | null
+          is_open?: boolean | null
+          name?: string
+          opens_at?: string | null
+          owner_id?: string | null
+          rating?: number | null
+          slug?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
@@ -23,7 +147,7 @@ export type Database = {
       [_ in never]: never
     }
     Enums: {
-      [_ in never]: never
+      queue_status: "waiting" | "called" | "seated" | "cancelled" | "completed"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -150,6 +274,8 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      queue_status: ["waiting", "called", "seated", "cancelled", "completed"],
+    },
   },
 } as const
